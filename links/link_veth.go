@@ -142,6 +142,7 @@ func (l *LinkVEth) deployAEnd(ctx context.Context, idx int) error {
 	// add the link
 	err := netlink.LinkAdd(linkA)
 	if err != nil {
+		// Error 2 here
 		log.Debugf("While adding link")
 		return err
 	}
@@ -163,7 +164,7 @@ func (l *LinkVEth) deployAEnd(ctx context.Context, idx int) error {
 	err = ep.GetNode().AddLinkToContainer(ctx, linkA,
 		SetNameMACAndUpInterface(linkA, ep))
 	if err != nil {
-		// Error here
+		// Error 1 here
 		log.Debugf("While adding link to container")
 		return err
 	}

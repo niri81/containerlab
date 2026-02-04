@@ -634,8 +634,13 @@ done:
 				var err error
 				err = syscall.Errno(-errno)
 
+				// this is already an error
+				log.Debugf("maybe already error: %s", err.Error())
+
 				unreadData := m.Data[4:]
+				// not true
 				if m.Header.Flags&unix.NLM_F_ACK_TLVS != 0 && len(unreadData) > syscall.SizeofNlMsghdr {
+					log.Debugf("in additional if")
 					// Skip the echoed request message.
 					echoReqH := (*syscall.NlMsghdr)(unsafe.Pointer(&unreadData[0]))
 					unreadData = unreadData[nlmAlignOf(int(echoReqH.Len)):]

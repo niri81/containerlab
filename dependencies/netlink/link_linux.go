@@ -1623,7 +1623,7 @@ func (h *Handle) linkModify(link Link, flags int) error {
 	log.Debugf("successful after if")
 
 	nameData := nl.NewRtAttr(unix.IFLA_IFNAME, nl.ZeroTerminated(base.Name))
-	log.Debugf("after RtAttr")
+	log.Debugf("after RtAttr, %s", base.Name)
 
 	req.AddData(nameData)
 	log.Debugf("after add data name")
@@ -1885,8 +1885,9 @@ func (h *Handle) linkModify(link Link, flags int) error {
 
 	req.AddData(linkInfo)
 
-	log.Debugf("successful after huge switch")
-
+	// 22:10:27 DEBU successful after huge switch, req is:
+	// &{NlMsghdr:{Len:16 Type:16 Flags:1541 Seq:6 Pid:0} Data:[0xc0008e53a0 0xc0009326c0 0xc000932780 0xc000932840 0xc000932900] RawData:[] Sockets:map[]}
+	log.Debugf("successful after huge switch, req is: %+v", req)
 	_, err := req.Execute(unix.NETLINK_ROUTE, 0)
 	if err != nil {
 		// Error here
