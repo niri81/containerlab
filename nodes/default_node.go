@@ -617,6 +617,7 @@ func (d *DefaultNode) GetHostsEntries(ctx context.Context) (clabtypes.HostEntrie
 	return result, nil
 }
 
+// This function errors
 func (d *DefaultNode) AddLinkToContainer(
 	ctx context.Context,
 	link netlink.Link,
@@ -627,22 +628,31 @@ func (d *DefaultNode) AddLinkToContainer(
 	// retrieve nodes nspath
 	nsp, err := d.OverwriteNode.GetNSPath(ctx)
 	if err != nil {
+		log.Debugf("while getting ns path")
 		return err
 	}
 	// retrieve the namespace handle
 	netns, err := ns.GetNS(nsp)
 	if err != nil {
+		log.Debugf("while getting ns")
+
 		return err
 	}
 	// move veth endpoint to namespace
 	if err := netlink.LinkSetNsFd(link, int(netns.Fd())); err != nil {
+		log.Debugf("while setting ns fd")
+
 		return err
 	}
 	// execute the given function
 	err = netns.Do(f)
 	if err != nil {
+		log.Debugf("while doing netns")
+
 		return err
 	}
+
+	log.Debugf("successful return")
 	return nil
 }
 
