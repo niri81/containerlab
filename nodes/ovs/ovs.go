@@ -114,6 +114,8 @@ func (n *ovs) AddLinkToContainer(
 	link netlink.Link,
 	f func(ns.NetNS) error,
 ) error {
+	log.Debugf("ovs node")
+
 	// retrieve the namespace handle
 	curNamespace, err := ns.GetCurrentNS()
 	if err != nil {

@@ -119,6 +119,8 @@ func (b *mgmtBridgeLinkNode) AddLinkToContainer(
 	link netlink.Link,
 	f func(ns.NetNS) error,
 ) error {
+	log.Debugf("mgmt br link node")
+
 	// retrieve the namespace handle
 	curNamespace, err := ns.GetCurrentNS()
 	if err != nil {

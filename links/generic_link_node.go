@@ -3,6 +3,7 @@ package links
 import (
 	"context"
 
+	"github.com/charmbracelet/log"
 	"github.com/containernetworking/plugins/pkg/ns"
 	clabnodesstate "github.com/srl-labs/containerlab/nodes/state"
 	"github.com/vishvananda/netlink"
@@ -19,6 +20,7 @@ func (g *GenericLinkNode) AddLinkToContainer(
 	link netlink.Link,
 	f func(ns.NetNS) error,
 ) error {
+	log.Debugf("generic link node")
 	// retrieve the namespace handle
 	netns, err := ns.GetNS(g.nspath)
 	if err != nil {

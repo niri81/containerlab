@@ -204,6 +204,8 @@ func (b *bridge) AddLinkToContainer(
 	link netlink.Link,
 	f func(ns.NetNS) error,
 ) error {
+	log.Debugf("bridge node")
+
 	if b.Cfg.NetworkMode != "" {
 		return b.addLinkToContainerNamespace(ctx, link, f)
 	}

@@ -507,6 +507,8 @@ func SetNameMACAndUpInterface(l netlink.Link, endpt Endpoint) func(ns.NetNS) err
 		if len(endpt.GetMac()) == 6 {
 			err := netlink.LinkSetHardwareAddr(l, endpt.GetMac())
 			if err != nil {
+				log.Debugf("while setting hw-addr")
+
 				return err
 			}
 		}
@@ -514,12 +516,15 @@ func SetNameMACAndUpInterface(l netlink.Link, endpt Endpoint) func(ns.NetNS) err
 		if endpt.GetIfaceAlias() != "" {
 			err := netlink.LinkSetAlias(l, endpt.GetIfaceAlias())
 			if err != nil {
+				log.Debugf("while setting alias")
 				return err
 			}
 			// Set a sanitized altname for ease of access. '/', and ' ' are changed to '-'
 			sanitizedIfaceName := SanitizeInterfaceName(endpt.GetIfaceAlias())
 			err = netlink.LinkAddAltName(l, sanitizedIfaceName)
 			if err != nil {
+				log.Debugf("while setting altname")
+
 				return err
 			}
 		}
@@ -530,6 +535,7 @@ func SetNameMACAndUpInterface(l netlink.Link, endpt Endpoint) func(ns.NetNS) err
 				endpt.GetIfaceName(), err)
 		}
 
+		log.Debugf("successful exit name mac and up")
 		return nil
 	}
 }

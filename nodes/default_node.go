@@ -622,6 +622,8 @@ func (d *DefaultNode) AddLinkToContainer(
 	link netlink.Link,
 	f func(ns.NetNS) error,
 ) error {
+	log.Debugf("default node")
+
 	// retrieve nodes nspath
 	nsp, err := d.OverwriteNode.GetNSPath(ctx)
 	if err != nil {
