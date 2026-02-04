@@ -286,4 +286,5 @@ require (
 replace (
 	github.com/weaveworks/ignite v0.10.0 => github.com/networkop/ignite v0.0.0-20240730102642-a3f2f53f9abc
 	github.com/weaveworks/libgitops v0.0.0-20200611103311-2c871bbbbf0c => github.com/networkop/libgitops v0.0.0-20221014201752-02ecf9790f58
+	github.com/vishvananda/netlink => ./dependencies/netlink
 )
