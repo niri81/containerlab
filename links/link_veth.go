@@ -137,17 +137,22 @@ func (l *LinkVEth) deployAEnd(ctx context.Context, idx int) error {
 		PeerName: peerEp.GetRandIfaceName(),
 		// PeerMac address is set later on
 	}
+	log.Debugf("Built netlink Veth")
 
 	// add the link
 	err := netlink.LinkAdd(linkA)
 	if err != nil {
+		log.Debugf("While adding link")
 		return err
 	}
+	log.Debugf("added link")
 
 	// disable TXOffloading
 	if err := clabutils.EthtoolTXOff(ep.GetRandIfaceName()); err != nil {
+		log.Debugf("while ethtooltxoff")
 		return err
 	}
+	log.Debugf("set ethtooltxoff")
 
 	// the link needs to be moved to the relevant network namespace
 	// and enabled (up). This is done via linkSetupFunc.
@@ -158,17 +163,22 @@ func (l *LinkVEth) deployAEnd(ctx context.Context, idx int) error {
 	err = ep.GetNode().AddLinkToContainer(ctx, linkA,
 		SetNameMACAndUpInterface(linkA, ep))
 	if err != nil {
+		// Error here
+		log.Debugf("While adding link to container")
 		return err
 	}
+	log.Debugf("Added link to container")
 
 	l.DeploymentState = LinkDeploymentStateHalfDeployed
 
 	// e.g. host endpoints are nodeless, and therefore the B end of the veth link should
 	// be deployed right after the A end is deployed.
 	if peerEp.IsNodeless() {
+		log.Debugf("deploying b end")
 		return l.deployBEnd(ctx, peerIdx)
 	}
 
+	log.Debugf("returning successfully")
 	return nil
 }
 
