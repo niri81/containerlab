@@ -15,6 +15,7 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/charmbracelet/log"
 	"github.com/vishvananda/netns"
 	"golang.org/x/sys/unix"
 )
@@ -555,6 +556,7 @@ func (req *NetlinkRequest) ExecuteIter(sockType int, resType uint16, f func(msg 
 	if s == nil {
 		s, err = getNetlinkSocket(sockType)
 		if err != nil {
+			log.Debugf("while getting netlink socket")
 			return err
 		}
 
@@ -587,10 +589,15 @@ func (req *NetlinkRequest) ExecuteIter(sockType int, resType uint16, f func(msg 
 
 	dumpIntr := false
 
+	log.Debugf("before for loop")
+
 done:
 	for {
+		log.Debugf("before receive")
 		msgs, from, err := s.Receive()
 		if err != nil {
+			log.Debugf("error with receive")
+
 			return err
 		}
 		if from.Pid != PidKernel {
@@ -612,6 +619,8 @@ done:
 			}
 
 			if m.Header.Type == unix.NLMSG_DONE || m.Header.Type == unix.NLMSG_ERROR {
+				log.Debugf("in large if")
+
 				// NLMSG_DONE might have no payload, if so assume no error.
 				if m.Header.Type == unix.NLMSG_DONE && len(m.Data) == 0 {
 					break done
@@ -647,6 +656,8 @@ done:
 					}
 				}
 
+				log.Debugf("error with large if")
+				// this triggers
 				return err
 			}
 			if resType != 0 && m.Header.Type != resType {
