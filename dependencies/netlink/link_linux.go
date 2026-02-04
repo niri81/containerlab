@@ -1403,9 +1403,11 @@ func (h *Handle) linkModify(link Link, flags int) error {
 		return fmt.Errorf("LinkAttrs.Name cannot be empty")
 	}
 
+	// Latest log message
 	log.Debugf("before isTuntap")
 
 	if isTuntap {
+		// Not triggered
 		log.Debugf("is tuntap")
 		if tuntap.Mode < unix.IFF_TUN || tuntap.Mode > unix.IFF_TAP {
 			return fmt.Errorf("Tuntap.Mode %v unknown", tuntap.Mode)
@@ -1571,7 +1573,10 @@ func (h *Handle) linkModify(link Link, flags int) error {
 		return nil
 	}
 
+	log.Debugf("before netlink req")
 	req := h.newNetlinkRequest(unix.RTM_NEWLINK, flags)
+
+	log.Debugf("before infomsg req")
 
 	msg := nl.NewIfInfomsg(unix.AF_UNSPEC)
 	// TODO: make it shorter
@@ -1599,38 +1604,56 @@ func (h *Handle) linkModify(link Link, flags int) error {
 		msg.Index = int32(base.Index)
 	}
 
+	log.Debugf("before add data")
 	req.AddData(msg)
 
 	if base.ParentIndex != 0 {
+		log.Debugf("parent index != 0")
 		b := make([]byte, 4)
 		native.PutUint32(b, uint32(base.ParentIndex))
+
+		log.Debugf("before rt attr")
 		data := nl.NewRtAttr(unix.IFLA_LINK, b)
+		log.Debugf("before add data again")
+
 		req.AddData(data)
 	} else if link.Type() == "ipvlan" || link.Type() == "ipoib" {
 		return fmt.Errorf("Can't create %s link without ParentIndex", link.Type())
 	}
+	log.Debugf("successful after if")
 
 	nameData := nl.NewRtAttr(unix.IFLA_IFNAME, nl.ZeroTerminated(base.Name))
+	log.Debugf("after RtAttr")
+
 	req.AddData(nameData)
+	log.Debugf("after add data name")
 
 	if base.Alias != "" {
+		log.Debugf("in base alias if")
 		alias := nl.NewRtAttr(unix.IFLA_IFALIAS, []byte(base.Alias))
+		log.Debugf("after rtattr if alias")
+
 		req.AddData(alias)
+		log.Debugf("successful after adddata alias")
 	}
 
 	if base.MTU > 0 {
 		mtu := nl.NewRtAttr(unix.IFLA_MTU, nl.Uint32Attr(uint32(base.MTU)))
 		req.AddData(mtu)
+		log.Debugf("successful after adddata mtu")
 	}
 
 	if base.TxQLen >= 0 {
 		qlen := nl.NewRtAttr(unix.IFLA_TXQLEN, nl.Uint32Attr(uint32(base.TxQLen)))
 		req.AddData(qlen)
+		log.Debugf("successful after adddata txqlen")
 	}
 
 	if base.HardwareAddr != nil {
 		hwaddr := nl.NewRtAttr(unix.IFLA_ADDRESS, []byte(base.HardwareAddr))
 		req.AddData(hwaddr)
+		log.Debugf("successful after adddata hwaddr")
+
 	}
 
 	if base.NumTxQueues > 0 {
@@ -1672,6 +1695,8 @@ func (h *Handle) linkModify(link Link, flags int) error {
 		groupAttr := nl.NewRtAttr(unix.IFLA_GROUP, nl.Uint32Attr(base.Group))
 		req.AddData(groupAttr)
 	}
+
+	log.Debugf("successful after if group 1")
 
 	if base.Namespace != nil {
 		var attr *nl.RtAttr
@@ -1860,18 +1885,26 @@ func (h *Handle) linkModify(link Link, flags int) error {
 
 	req.AddData(linkInfo)
 
+	log.Debugf("successful after huge switch")
+
 	_, err := req.Execute(unix.NETLINK_ROUTE, 0)
 	if err != nil {
+		// Error here
+		log.Debugf("during execute")
 		return err
 	}
 
 	h.ensureIndex(base)
+	log.Debugf("after ensureindex")
 
 	// can't set master during create, so set it afterwards
 	if base.MasterIndex != 0 {
+		log.Debugf("in function return")
 		// TODO: verify MasterIndex is actually a bridge?
 		return h.LinkSetMasterByIndex(link, base.MasterIndex)
 	}
+
+	log.Debugf("successful return linkmodify")
 	return nil
 }
 
