@@ -634,6 +634,7 @@ func (d *DefaultNode) AddLinkToContainer(
 	// retrieve the namespace handle
 	netns, err := ns.GetNS(nsp)
 	if err != nil {
+		// Errors here, GetNS uses StatFS in func IsNSorErr
 		log.Debugf("while getting ns")
 
 		return err
